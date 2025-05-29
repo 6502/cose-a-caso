@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+    body { overflow: hidden;
+           margin: 0px;
+           padding: 0px;
+           background: #888; }
+    </style>
+  </head>
+  <body>
+    <script>
+
+let canvas = document.body.appendChild(document.createElement("canvas")),
+    ctx = canvas.getContext("2d"),
+    sf = 1, zx = 0, zy = 0,
+    map = ({x, y}) => ({x: sf*x+zx, y: sf*y+zy}),
+    rmap = ({x, y}) => ({x: (x-zx)/sf, y: (y-zy)/sf}),
+
+    _x = o => typeof o === "number" ? o : o.x,
+    _y = o => typeof o === "number" ? o : o.y,
+    add = (a, b) => ({x: _x(a) + _x(b), y:_y(a) + _y(b)}),
+    sub = (a, b) => ({x: _x(a) - _x(b), y:_y(a) - _y(b)}),
+    mul = (a, b) => ({x: _x(a) * _x(b), y:_y(a) * _y(b)}),
+    div = (a, b) => ({x: _x(a) / _x(b), y:_y(a) / _y(b)}),
+    dot = (a, b) => a.x * b.x + a.y * b.y,
+    cross = (a, b) => a.x*b.y - a.y*b.x,
+    dist2 = (a, b) => (a.x - b.x)**2 + (a.y - b.y)**2,
+    dist = (a, b) => Math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2),
+    len2 = a => a.x**2 + a.y**2,
+    len = a => Math.sqrt(a.x**2 + a.y**2),
+    dir = a => div(a, len(a)),
+    ortho = a => ({x: -a.y, y:a.x}),
+    rot = (aa) => [Math.cos(aa), Math.sin(aa),
+                   -Math.sin(aa), Math.cos(aa),
+                   0, 0],
+    xlate = d => [1, 0,
+                  0, 1,
+                  d.x, d.y],
+    pmul = (p, m) => ({x:p.x*m[0] + p.y*m[2] + m[4],
+                       y:p.x*m[1] + p.y*m[3] + m[5]}),
+    mmul = (a, ...bs) => {
+        for (let b of bs) {
+            a = [a[0]*b[0] + a[1]*b[2], a[0]*b[1] + a[1]*b[3],
+                 a[2]*b[0] + a[3]*b[2], a[2]*b[1] + a[3]*b[3],
+                 a[4]*b[0] + a[5]*b[2] + b[4], a[4]*b[1] + a[5]*b[3] + b[5]];
+        }
+        return a;
+    },
+    inv = a => {
+        let k = 1 / (a[0]*a[3] - a[1]*a[2]);
+        return [a[3]*k, -a[1]*k,
+                -a[2]*k, a[0]*k,
+                (a[2]*a[5] - a[3]*a[4])*k, (a[4]*a[1] - a[5]*a[0])*k];
+    },
+
+    ddot = (ctx, p, color="#000") => {
+        ctx.beginPath();
+        ctx.arc(sf*p.x+zx, sf*p.y+zy, 4, 0, 2*Math.PI, true);
+        ctx.fillStyle = color;
+        ctx.fill();
+    },
+    dline = (ctx, a, b, color="#000", width=1) => {
+        ctx.beginPath();
+        ctx.moveTo(sf*a.x+zx, sf*a.y+zy);
+        ctx.lineTo(sf*b.x+zx, sf*b.y+zy);
+        ctx.lineWidth = width;
+        ctx.strokeStyle = color;
+        ctx.stroke();
+    },
+    car = (()=>{
+        let img = document.createElement("img");
+        img.src = "car1.png";
+        img.onload = ()=>{
+            repaint();
+        };
+        return img;
+    })(),
+    car_s = (()=>{
+        let img = document.createElement("img");
+        img.src = "car1_s.png";
+        img.onload = ()=>{
+            repaint();
+        };
+        return img;
+    })(),
+    drawcar = (ctx, img, A, B) => {
+        let dx = sf*(B.x - A.x),
+            dy = sf*(B.y - A.y),
+            distance = Math.sqrt(dx * dx + dy * dy),
+            angle = Math.atan2(dy, dx),
+            scale = distance / car.width * 1.4;
+        ctx.save();
+        ctx.translate(A.x*sf+zx, A.y*sf+zy);
+        ctx.rotate(angle);
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, -img.width*0.15, -img.height / 2);
+        ctx.restore();
+    },
+    carmove = (ab, dist, angle)=>{
+        let a2 = angle + Math.atan2(ab[3]-ab[1], ab[2]-ab[0]),
+            vx = -dist*10*Math.cos(a2), vy = -dist*10*Math.sin(a2);
+        ab[0] += vx; ab[1] += vy;
+        let dx = ab[2]-ab[0], dy = ab[3]-ab[1],
+            k = 200 / Math.sqrt(dx*dx + dy*dy);
+        ab[2] = ab[0] + k*dx;
+        ab[3] = ab[1] + k*dy;
+    },
+    run = false,
+    Car = (img)=>({
+        A: {x:1000, y:300},
+        B: {x:1200, y:300},
+        move(dist, angle){
+            let ab = [this.A.x, this.A.y, this.B.x, this.B.y];
+            carmove(ab, dist, angle);
+            this.A = {x:ab[0], y:ab[1]};
+            this.B = {x:ab[2], y:ab[3]};
+        },
+        draw(ctx){
+            drawcar(ctx, img, this.A, this.B);
+            ddot(ctx, this.A, "#F00");
+            ddot(ctx, this.B, "#0F0");
+        },
+        mousedown(event){
+            let mp = rmap({x:event.clientX, y:event.clientY});
+            if (dist(this.A, mp) < 8/sf) {
+                track((p, phase) => {
+                    run = false;
+                    this.A = rmap(p);
+                    this.B = add(this.A, mul(200, dir(sub(this.B, this.A))));
+                    repaint();
+                });
+                return true;
+            } else if (dist(this.B, mp) < 8/sf) {
+                track((p, phase) => {
+                    run = false;
+                    this.B = rmap(p);
+                    this.A = add(this.B, mul(200, dir(sub(this.A, this.B))));
+                    repaint();
+                });
+                return true;
+            }
+            return false;
+        },
+    }),
+    cpath = Array(200).fill(0),
+    entities = [Car(car_s), Car(car)],
+    err = ()=>{
+        let e = 0, t = entities[0], c = entities[1],
+            tab = [t.A.x, t.A.y, t.B.x, t.B.y],
+            cab = [c.A.x, c.A.y, c.B.x, c.B.y];
+        let od = 0, oa = 0, ood = 0, ooa = 0;
+        for (let i=0; i<cpath.length; i+=2) {
+            let dist = cpath[i], angle = cpath[i+1];
+            carmove(cab, dist, angle);
+            e += (dist-od)**2 + (angle-oa)**2 + 10*((dist-2*od+ood)**2) + 10*((angle-2*oa+ooa)**2);
+            ood = od; od = dist;
+            ooa = oa; oa = angle;
+        }
+        return (tab[0]-cab[0])**2 + (tab[1]-cab[1])**2 +
+               (tab[2]-cab[2])**2 + (tab[3]-cab[3])**2 +
+               e*0.1;
+    },
+    curr = 0,
+    smooth = ()=>{
+        let old = cpath.slice();
+        for (let i=2; i<cpath.length-2; i+=2) {
+            cpath[i] = (old[i-2]+14*old[i]+old[i+2])/16;
+            cpath[i+1] = (old[i-1]+14*old[i+1]+old[i+3])/16;
+        }
+    },
+    improve = ()=>{
+        if (!run) return;
+        smooth();
+        curr = err();
+        for (let k=0; k<100; k++) {
+            let i = (1+Math.floor(Math.random()*(cpath.length/2-2)))*2,
+                odi = cpath[i], oai = cpath[i+1];
+            cpath[i] += (Math.random()-0.5)*(Math.random()**4);
+            cpath[i+1] = Math.max(-1, Math.min(1, cpath[i+1] + (Math.random()-0.5)*(Math.random()**4)));
+            e = err();
+            if (e > curr) {
+                cpath[i] = odi;
+                cpath[i+1] = oai;
+            } else {
+                curr = e;
+            }
+        }
+    },
+    repaint = ()=>{
+        let w = canvas.width = innerWidth,
+            h = canvas.height = innerHeight;
+        for (let i=0; i<entities.length; i++) {
+            let e = entities[i];
+            if (e.draw) e.draw(ctx);
+        }
+        let t = Date.now()/2000,
+            f = ((t - Math.floor(t))*cpath.length|0)&~1;
+        if (run) {
+            let c = entities[1], cab = [c.A.x, c.A.y, c.B.x, c.B.y], pts = [];
+            for (let i=0; i<cpath.length; i+=2) {
+                let dist = cpath[i], angle = cpath[i+1];
+                carmove(cab, dist, angle);
+                if (i === f) {
+                    drawcar(ctx, car, {x:cab[0], y:cab[1]}, {x:cab[2], y:cab[3]});
+                }
+                pts.push({x:cab[0], y:cab[1]});
+            }
+            ctx.fillStyle = "#FFF";
+            pts.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x*sf+zx, p.y*sf+zy, 3, 0, 2*Math.PI, true);
+                ctx.fill();
+            });
+        }
+    },
+    track = f => {
+        let ss = document.body.appendChild(document.createElement("div"));
+        ss.style.position = "fixed";
+        ss.style.left = "0px";
+        ss.style.top = "0px";
+        ss.style.right = "0px";
+        ss.style.bottom = "0px";
+        let mm = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            f({x:event.clientX, y:event.clientY}, 1);
+        };
+        let mu = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            f({x:event.clientX, y:event.clientY}, 2);
+            document.removeEventListener("mousemove", mm);
+            document.removeEventListener("mouseup", mu);
+            document.body.removeChild(ss);
+        };
+        document.addEventListener("mousemove", mm);
+        document.addEventListener("mouseup", mu);
+    };
+
+canvas.addEventListener("wheel", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    let p = rmap({x:event.clientX, y:event.clientY});
+    sf = Math.max(0.001, Math.min(1000, sf * Math.exp(-event.deltaY*[1, 10, 100][event.deltaMode] /
+                  (event.shiftKey ? 10000 : 1000))));
+    zx = event.clientX - p.x*sf;
+    zy = event.clientY - p.y*sf;
+    repaint();
+});
+
+document.addEventListener("contextmenu", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    return false;
+});
+
+canvas.addEventListener("mousedown", event => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.button === 1) {
+        let x0 = event.clientX, y0 = event.clientY;
+        track(({x, y})=>{
+            zx += x-x0; zy += y-y0;
+            x0 = x; y0 = y;
+            repaint();
+        });
+    } else if (event.button === 0) {
+        for (let i=0; i<entities.length; i++) {
+            let e = entities[i];
+            if (e.mousedown && e.mousedown(event)) return;
+        }
+        for (let i=0; i<cpath.length; i++) cpath[i] = 0;
+        curr = err();
+        run = true;
+    } else if (event.button === 2) {
+        for (let i=0; i<entities.length; i++) {
+            let e = entities[i];
+            if (e.mousedown && e.mousedown(event)) return;
+        }
+    }
+});
+
+setInterval(()=>{ improve(); repaint(); }, 10);
+repaint();
+
+setInterval((()=>{
+    let csz = null;
+    return ()=>{
+        let sz = innerWidth + "/" + innerHeight;
+        if (sz !== csz) {
+            csz = sz;
+            repaint();
+        }
+    };
+})(), 10);
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+        html {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        body {
+            background: #333;
+            font-family: sans-serif;
+            color: #FFF;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .code {
+            white-space: pre;
+            background: #000;
+            padding: 5vh;
+            border-radius: 2vh;
+            box-shadow: 1vh 1vh 4vh rgba(0,0,0,0.5);
+            display: inline-block;
+            color: #CFC;
+            font-weight: 400;
+            font-size: 110%;
+            font-family: Courier New;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+        }
+        .slide {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            padding: 5vh;
+            font-size: 5vh;
+            background: #333;
+            color: #FFF;
+            opacity: 0;
+        }
+        .slideno {
+            position: absolute;
+            right: 1em;
+            bottom: 1em;
+            padding: 2vh;
+            font-size: 2vh;
+            color: #CCC;
+        }
+        ul {
+            margin-left: 10%;
+        }
+        ol {
+            margin-left: 10%;
+        }
+        li {
+            line-height: 140%;
+            xwidth: 75%;
+        }
+        b {
+            color: #FA4;
+        }
+        .code b {
+            background: #F00;
+            color: #FFF;
+        }
+        u {
+            background: #F00;
+            text-decoration: none;
+        }
+        table {
+            margin-top: 3vh;
+            border-collapse: collapse;
+        }
+        td {
+            padding: 1vh;
+            xborder: solid 1px #FFF;
+        }
+        th {
+            padding: 1vh;
+            color: #FA4;
+            xborder: solid 1px #FFF;
+        }
+        .char {
+            text-align: center;
+            width: 1em;
+            height: 1.2em;
+            font-size: 80%;
+            background: #000;
+            box-shadow: inset 0vh 0vh 0.5vh 0.125vh #FA4;
+            display: inline-block;
+        }
+    </style>
+  </head>
+  <body>
+    <script id="src" type="data">
+---
+    <h1>Cose a caso</h1>
+    <center :1:><h2>su problemi difficili</h2></center>
+    <center :2:><br><h3>ovvero quando random.random() può aiutare dove la matematica si incastra</h3></center>
+---
+    <h1>Chi sono</h1>
+    <center :1:><h3>Andrea "6502" Griffini</h3></center>
+    <center :2:><h3>Da 25+ anni lavoro per COMELZ (https://www.comelz.com)</h3><center>
+    <center :3:><h3>Mi occupo principalmente di ottimizzazione e visione industriale</h3><center>
+---
+    <h1>Develer</h1>
+    <center :1:><h3>Società del gruppo COMELZ che si occupa di software - firmware - elettronica (https://www.develer.com)</h3></center>
+    <center :2:><h3>Stiamo assumendo</h3><center>
+---
+    <h1>Random walk optimization</h1>
+    <ul :1:>
+      <li>Si sta cercando una configurazione di parametri</li>
+      <li>Che minimizza una determinata funzione matematica "loss"</li>
+      <li>La funzione è "complicata"
+        <ul style="margin-left:5%">
+          <li :2:>Dominio non semplice</li>
+          <li :3:>Non differenziabile</li>
+        </ul>
+      </li>
+      <li :4:>La funzione è comunque continua o quasi</li>
+    </ul>
+---
+    <h1>Algoritmo</h1>
+    <ol>
+      <li>Si parte da un punto a caso</li>
+      <li>Si prova a fare un "passo" a caso</li>
+      <li>Se la loss è calata si accetta il cambiamento, altrimenti no
+      <li>Goto 2
+    </ol>
+---
+    <h1>Esempio 1<br><br>Cerchio per tre punti</h1>
+    <br>
+    <center><h2 :1:>2 parametri</h2></center>
+---
+    <center>
+        <img src="circle0.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="circle1.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="circle2.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="circle3.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <h1>Jupyter time!</h1>
+    <center>
+---
+    <h1>Esempio 2<br><br>Calibrazione di una camera 3d</h1>
+    <br>
+    <center><h2 :1:>11 parametri</h2></center>
+---
+    <center>
+        <img src="3d2d.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="3d2d_m12.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="cubo2b.jpg" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="cubo2c.jpg" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="cubo2d.jpg" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <h1>Jupyter time!</h1>
+    <center>
+---
+    <h1>Esempio 3<br><br>MNIST<br><span :1:>riconoscimento scrittura 0...9</span></h1>
+    <br>
+    <center><h2 :2:>7850 parametri</h2></center>
+---
+    <center>
+        <img src="mnist.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <img src="mnist_model.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <h1>Jupyter time!</h1>
+    <center>
+---
+    <h1>Esempio 4<br><br>Car parking</h1>
+    <br>
+    <center><h2 :1:>200 parametri</h2></center>
+---
+    <center>
+        <img src="car_model.png" style="width: 90vw; height: 90vh; object-fit:contain; display: block;">
+    <center>
+---
+    <center>
+        <h1>Demo time!</h1>
+    <center>
+---
+    <h1>The End</h1>
+    <center><h2 :1:>Domande?</h2></center>
+    </script>
+    <script>
+
+let src = document.getElementById("src").textContent.split("\n---\n"),
+    slides = (()=>{
+        let res = [];
+        src.forEach(ss => {
+            ss = ss.replace(/<code>\n(.*?)\n *<\/code>/gs, (x, c) => `<div class="code">${c.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</div>`);
+            if (ss.indexOf(":1:") >= 0) {
+                let n = 0;
+                ss.replace(/:([0-9]+):/g, (x, g) => n = Math.max(n, +g));
+                for (let i=0; i<=n; i++) {
+                    res.push(ss.replace(/:([0-9]+):/g, (x, g) => {
+                        if (+g > i) {
+                            return "style=\"visibility:hidden\"";
+                        } else {
+                            return "";
+                        }
+                    }));
+                }
+            } else {
+                let n = 0;
+                ss.replace(/#([0-9]+)#/g, (x, g) => n = Math.max(n, +g));
+                for (let i=0; i<=n; i++) {
+                    res.push(ss.replace(/#([0-9]+)#(.*?)##/gs, (x, g, c) => {
+                        if (+g !== i) {
+                            return c;
+                        } else {
+                            return "<b>" + c + "</b>";
+                        }
+                    }));
+                }
+            }
+        });
+        res = res.map(ss => ss.replace(/%%(.*?)%%/g, (_, g) =>
+                  g.replace(/&#[0-9]+;/g, x => String.fromCharCode(+x.slice(2,-1)))
+                   .split("")
+                   .map(c => `<div class="char">${c.replace(/ /g,"&nbsp;")}</div>`)
+                   .join("")));
+        return res;
+    })(),
+    current = null,
+    show = sno => {
+        let frame = document.createElement("div");
+        frame.innerHTML = slides[sno];
+        frame.className = "slide";
+        let slideno = document.createElement("div");
+        slideno.className = "slideno";
+        slideno.textContent = sno+1;
+        frame.appendChild(slideno);
+        document.body.appendChild(frame);
+        frame._sno = sno;
+        frame.onmousedown = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            if (event.button === 0) {
+                if (sno < slides.length -1) show(sno+1);
+            } else if (event.button === 2) {
+                if (sno > 0) show(sno-1);
+            }
+        }
+        let t0 = Date.now(),
+            cc = current,
+            anim = ()=>{
+                let t = Math.min(1, (Date.now() - t0) / 250);
+                frame.style.opacity = t;
+                if (t === 1) {
+                    if (cc) document.body.removeChild(cc);
+                } else {
+                    setTimeout(anim, 16);
+                }
+            };
+        current = frame;
+        setTimeout(anim, 16);
+    };
+
+document.oncontextmenu = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+};
+
+document.onkeydown = (event)=>{
+    if (event.key === "ArrowLeft" || event.key === "Tab") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (current && current._sno > 0) show(current._sno-1);
+    } else if (event.key === "ArrowRight" || event.key === "Enter") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (current && current._sno < slides.length-1) show(current._sno+1);
+    } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        event.stopPropagation();
+        show(0);
+    } else if (event.key === "ArrowDown") {
+        event.preventDefault();
+        event.stopPropagation();
+        show(slides.length-1);
+    }
+    return true;
+};
+
+show(0);
+
+    </script>
+  </body>
+</html>
